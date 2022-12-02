@@ -16,4 +16,8 @@ public class ScenController : MonoBehaviour
     {
         SceneManager.LoadScene(1);
     }
+    public void PlayWithFriendScreen()
+    {
+        SceneManager.LoadScene(3);
+    }
 }
