@@ -3,12 +3,19 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UIElements;
+
 using UnityEngine.UI;
 using Unity.VisualScripting;
+using System.Net;
+
 
 public class InputController1 : MonoBehaviour
 {
+    public float timeStart = 20;
+    public Text timeText ,timeheader;
+    [SerializeField]
+    private Image r,l,t,b;
+    private bool timeActive = true, autoSelect1 = true ,autoSelect2 = true;
     private AnimationController1 animationController1;
     private GamePlayController1 gameplayController1;
     private string playerChoice;
@@ -28,19 +35,186 @@ public class InputController1 : MonoBehaviour
         animationController1 = GetComponent<AnimationController1>();
         gameplayController1 = GetComponent<GamePlayController1>();
     }
+    private void Start()
+    {
+        timeText.text = timeStart.ToString();
+        timeText.color = Color.green;
+        timeheader.color = Color.green;
+        r.color = Color.green;
+        l.color = Color.green;
+        t.color = Color.green;
+        b.color = Color.green;
+        player1AutoSelect();
+        player2AutoSelect();
+
+    }
 
     private void Update()
     {
-        
+        if (timeActive)
+        {
+            timeStart -= Time.deltaTime;
+            timeText.text = Mathf.Round(timeStart).ToString();
+        }
+
+        if (timeStart <= 20)
+        {
+            timeText.color = Color.green;
+            timeheader.color = Color.green;
+            r.color = Color.green;
+            l.color = Color.green;
+            t.color = Color.green;
+            b.color = Color.green;
+        }
+        if (timeStart <= 10)
+        {
+            timeText.color = Color.yellow;
+            timeheader.color = Color.yellow;
+            r.color = Color.yellow;
+            l.color = Color.yellow;
+            t.color = Color.yellow;
+            b.color = Color.yellow;
+        }
+        if (timeStart <= 5)
+        {
+            timeText.color = Color.red;
+            timeheader.color = Color.red;
+            r.color = Color.red;
+            l.color = Color.red;
+            t.color = Color.red;
+            b.color = Color.red;
+        }
+       /* if (timeStart == 0)
+        {
+            timeActive = false;
+            
+            
+        }*/  
+     
     }
+    private void FixedUpdate()
+    {
+
+        player2AutoSelect();
+        player1AutoSelect();
+        
+        /* if (timeStart < 27 && autoSelect2)
+         {
+             timeActive = false;
+             int random = Random.Range(0, 3);
+
+             switch (random)
+             {
+                 case 0:
+                     selectedChoice_player2 = GameChoices.ROCK;
+                     autoSelect2 = false;
+                     break;
+                 case 1:
+                     selectedChoice_player2 = GameChoices.PAPER;
+                     autoSelect2 = false;
+                     break;
+                 case 2:
+                     selectedChoice_player2 = GameChoices.SCISSORS;
+                     autoSelect2 = false;
+                     break;
+             }
+             print("Player 2 selected : " + random);
+             gameplayController1.SetChoices_Player2(selectedChoice_player2);
+             animationController1.PlayerMadeChoice();
+             DetermineWinner();
+         }*/
+    }
+    public void player2AutoSelect()
+    {
+        if (timeStart < 0 && autoSelect2)
+        {
+            timeActive = false;
+            int random2 = Random.Range(0, 3);
+
+            switch (random2)
+            {
+                case 0:
+                    selectedChoice_player2 = GameChoices.ROCK;
+                    break;
+                case 1:
+                    selectedChoice_player2 = GameChoices.PAPER;
+                    break;
+                case 2:
+                    selectedChoice_player2 = GameChoices.SCISSORS;
+                    break;
+            }
+            print("Player 2 selected : " + random2);
+            gameplayController1.SetChoices_Player2(selectedChoice_player2);
+            animationController1.PlayerMadeChoice();
+
+           
+            autoSelect2 = false;
+            if (autoSelect1 && autoSelect2)
+            {
+                DetermineWinner();
+            }else if (player1_select)
+            {
+                player1_select = false;
+                DetermineWinner();
+            }
+            else 
+            {
+                return;
+            }
+          
+        } 
+    }
+    public void player1AutoSelect()
+    {
+        if (timeStart < 0 && autoSelect1)
+        {
+            timeActive = false;
+            int random1 = Random.Range(0, 3);
+
+            switch (random1)
+            {
+                case 0:
+                    selectedChoice_player1 = GameChoices.ROCK;
+                    break;
+                case 1:
+                    selectedChoice_player1 = GameChoices.PAPER;
+                    break;
+                case 2:
+                    selectedChoice_player1 = GameChoices.SCISSORS;
+                    break;
+            }
+            print("Player 1 selected : " + random1);
+            gameplayController1.SetChoices_Player1(selectedChoice_player1);
+            animationController1.PlayerMadeChoice();
+
+
+            
+            autoSelect1 = false;
+            if (autoSelect1 && autoSelect2)
+            {
+                return;
+            }else if (player2_select)
+            {
+                player2_select = false;
+                DetermineWinner();
+            }
+            else {
+                DetermineWinner();
+            }
+           
+        }
+       
+    }
+
 
     public void Player1_GetChoice()
     {
         selected1.SetActive(true);
         player1_select = true;
+        autoSelect1 = false;
         choiceName1 = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name;
         print("Player 1 selected : " + choiceName1);
-        
+
         switch (choiceName1)
         {
             case "Rock":
@@ -52,18 +226,20 @@ public class InputController1 : MonoBehaviour
             case "Scissors":
                 selectedChoice_player1 = GameChoices.SCISSORS;
                 break;
-        }  
+        }
         gameplayController1.SetChoices_Player1(selectedChoice_player1);
         if (player2_select)
-        {           
-            player2_select=false;
+        {
+            player2_select = false;
             player1_select = false;
             animationController1.PlayerMadeChoice();
-            DetermineWinner(); 
+            DetermineWinner();
         }
+        
     }
-    public void Player2_GetChoice()
+        public void Player2_GetChoice()
     {
+        autoSelect2 = false;
         selected2.SetActive(true);
         player2_select = true;
         choiceName2 = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name;
@@ -182,6 +358,10 @@ public class InputController1 : MonoBehaviour
         yield return new WaitForSeconds(1f);
         info_txt.gameObject.SetActive(false);
         animationController1.ResetAnimation();
+        timeStart = 20;
+        timeActive = true;
+        autoSelect1 = true;
+        autoSelect2 = true;
     }
     private void Player1Score()
     {
@@ -189,6 +369,7 @@ public class InputController1 : MonoBehaviour
         player1_ScoreText.text = player1_Score.ToString();
         player1_WinScoreText.text = player1_Score.ToString();
         Invoke("PlayerWinOrLose", 2.0f);
+        print("score 1 : " + player1_Score);
 
     }
     private void Player2Score()
@@ -197,17 +378,18 @@ public class InputController1 : MonoBehaviour
         player2_scoreText.text = player2_Score.ToString();
         player2_WinScoreText.text = player2_Score.ToString();
         Invoke("PlayerWinOrLose", 2.0f);
+        print("score 2 : " + player2_Score);
     }
     private void PlayerWinOrLose()
     {
-        if (player1_Score == 3)
+        if (player1_Score == 5)
         {
             Time.timeScale = 0;
             winLose_text.text = "PLAYER IS WINNER";
             winLoseScreen.gameObject.SetActive(true);
 
         }
-        if (player2_Score == 3)
+        if (player2_Score == 5)
         {
             Time.timeScale = 0;
             winLose_text.text = "PLAYER2 IS WINNER";
