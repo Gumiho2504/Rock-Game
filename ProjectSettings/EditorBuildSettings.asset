@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/PlayWithfriend.unity
     guid: 278dd6458bf62bc4bbd3b8953cd5bda7
+  - enabled: 1
+    path: Assets/Scenes/Online.unity
+    guid: 36172bc4a6083c04ea285e4366304b4b
   m_configObjects: {}

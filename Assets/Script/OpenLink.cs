@@ -6,8 +6,13 @@ public class OpenLink : MonoBehaviour
 {
     [SerializeField]
     private Text language_Text;
+    [SerializeField]
+    private AudioSource bgSound;
+    [SerializeField] private Button soundbtn;
+    [SerializeField] private Text soundBtnText;
     private string[] language = new string[] { "ENGLISH", "CHINESE", "KHMER" };
     private int n = 0;
+    private bool state = false;
     
    public void Openfacebook()
     {
@@ -25,7 +30,23 @@ public class OpenLink : MonoBehaviour
     {
         Application.OpenURL("https://www.instagram.com/t.r_e.y/?igshid=ZDdkNTZiNTM%3D&fbclid=IwAR3-TTC7xqkvwDGs23-bD2JRNt-XIWivs2DUE1ZwZXa1flFRFlRahEA5vZ8");
     }
-
+    public void SoundBtn()
+    {
+        state = !state;
+        if (state)
+        {
+            bgSound.mute = true;
+            soundbtn.image.color = Color.red;
+            soundBtnText.text = "OFF"; 
+        }
+        if (!state)
+        {
+            bgSound.mute = false;
+            soundbtn.image.color = Color.blue;
+            soundBtnText.text = "ON";
+        }
+        
+    }
     public void Go() 
     {
         n++;
