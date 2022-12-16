@@ -18,7 +18,7 @@ public class InputController1 : MonoBehaviour
     private bool timeActive = true, autoSelect1 = true ,autoSelect2 = true;
     private AnimationController1 animationController1;
     private GamePlayController1 gameplayController1;
-    private string playerChoice;
+    
     private GameChoices selectedChoice_player2 = GameChoices.NONE;
     private GameChoices selectedChoice_player1 = GameChoices.NONE;
     private bool player1_select = false, player2_select = false ;
@@ -397,6 +397,7 @@ public class InputController1 : MonoBehaviour
 
         }
     }
+    
 
 }
 

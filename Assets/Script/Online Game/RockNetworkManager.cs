@@ -1,58 +1,53 @@
 using UnityEngine;
 using Mirror;
 
-/*
-	Documentation: https://mirror-networking.gitbook.io/docs/components/network-manager
-	API Reference: https://mirror-networking.com/docs/api/Mirror.NetworkManager.html
-*/
 
-namespace Mirror
-{
-    // Custom NetworkManager that simply assigns the correct racket positions when
-    // spawning players. The built in RoundRobin spawn method wouldn't work after
-    // someone reconnects (both players would be on the same side).
-    [AddComponentMenu("")]
+
     public class RockNetworkManager : NetworkManager
     {
         
-        GameObject ball;
-
+      /*  GameObject playerChoice;*/
+      
+        public Transform player1, player2;
         public override void OnServerAddPlayer(NetworkConnectionToClient conn)
         {
+            Transform start = numPlayers == 0 ? player1 : player2;
+            GameObject player = Instantiate(playerPrefab, start.position, start.rotation);
 
-            // add player at correct spawn position
-            
-            if (numPlayers == 0) 
-            { 
-                GameObject player = Instantiate(playerPrefab, transform.position, transform.rotation) as GameObject;
-                player.transform.SetParent(GameObject.FindGameObjectWithTag("player1").transform, false);
-                NetworkServer.AddPlayerForConnection(conn, player);
-            }
-            else
-            {
-                GameObject player = Instantiate(playerPrefab, transform.position, transform.rotation) as GameObject;
-                player.transform.SetParent(GameObject.FindGameObjectWithTag("player2").transform, false); 
-                NetworkServer.AddPlayerForConnection(conn, player);
-            }
-           
+            NetworkServer.AddPlayerForConnection(conn, player);
 
-            // spawn ball if two players
-            /*if (numPlayers == 2)
+            //NetworkServer.Spawn(player);
+           /* if (numPlayers == 2)
             {
-                ball = Instantiate(spawnPrefabs.Find(prefab => prefab.name == "Ball"));
-                NetworkServer.Spawn(ball);
+                playerChoice = Instantiate(spawnPrefabs.Find(prefab => prefab.name == "playerchoice"));
+                NetworkServer.Spawn(playerChoice);
             }*/
         }
-
+      
         public override void OnServerDisconnect(NetworkConnectionToClient conn)
         {
             // destroy ball
-            if (ball != null)
-                NetworkServer.Destroy(ball);
+           /* if (playerChoice != null)
+                NetworkServer.Destroy(playerChoice);*/
 
             // call base functionality (actually destroys the player)
             base.OnServerDisconnect(conn);
         }
-    }
+
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            print("server start");
+        }
+
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+            print("Client Joining Server");
+        }
+
+    
+
 }
+
 
