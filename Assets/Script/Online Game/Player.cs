@@ -30,7 +30,9 @@ public class Player : NetworkBehaviour
     private string winLoseString;
     private bool clientSelected = false , serverselected = false;
     bool state = false;
-    
+    [SerializeField]
+    private Text player1_ScoreText, player2_scoreText;
+    private int player1_Score = 0, player2_Score = 0;
     [ClientCallback]
     private void Awake()
     {
@@ -167,31 +169,37 @@ public class Player : NetworkBehaviour
         {
             print("client win");
             winLoseString = "client win";
+            Invoke("Player2Score", 1f);
         }
         if(clientChoice == GameChoices.ROCK && serveChoice == GameChoices.PAPER)
         {
             print("server win");
             winLoseString = "server win";
+            Invoke("Player1Score", 1f);
         }
         if(serveChoice == GameChoices.ROCK && clientChoice == GameChoices.SCISSORS)
         {
             print("server win");
             winLoseString = "server win";
+            Invoke("Player1Score", 1f);
         }
         if (clientChoice == GameChoices.ROCK && serveChoice == GameChoices.SCISSORS)
         {
             print("client win");
             winLoseString = "client win";
+            Invoke("Player2Score", 1f);
         }
         if (clientChoice == GameChoices.PAPER && serveChoice == GameChoices.SCISSORS)
         {
             print("server win");
             winLoseString = "server win";
+            Invoke("Player1Score", 1f);
         }
         if (clientChoice == GameChoices.SCISSORS && serveChoice == GameChoices.PAPER)
         {
             print("client win");
             winLoseString = "client win";
+            Invoke("Player2Score", 1f);
         }
         winLoseText.text = winLoseString;
         StartCoroutine(DisplayWinnerAndRestart());
@@ -229,9 +237,17 @@ public class Player : NetworkBehaviour
       
     }
 
-    public void home()
+    private void Player1Score()
     {
-        SceneManager.LoadScene(0);
+        player1_Score++;
+        player1_ScoreText.text = player1_Score.ToString();
     }
+    private void Player2Score()
+    {
+        player2_Score++;
+        player2_scoreText.text = player2_Score.ToString(); 
+    }
+
+
 
 }//  end of class

@@ -1,9 +1,8 @@
 using UnityEngine;
 using Mirror;
+using UnityEngine.SceneManagement;
 
-
-
-    public class RockNetworkManager : NetworkManager
+public class RockNetworkManager : NetworkManager
     {
         
       /*  GameObject playerChoice;*/
@@ -26,11 +25,12 @@ using Mirror;
       
         public override void OnServerDisconnect(NetworkConnectionToClient conn)
         {
-            // destroy ball
-           /* if (playerChoice != null)
-                NetworkServer.Destroy(playerChoice);*/
+        // destroy ball
+        /* if (playerChoice != null)
+             NetworkServer.Destroy(playerChoice);*/
 
-            // call base functionality (actually destroys the player)
+        // call base functionality (actually destroys the player)
+        
             base.OnServerDisconnect(conn);
         }
 
@@ -46,7 +46,11 @@ using Mirror;
             print("Client Joining Server");
         }
 
-    
+    public override void OnClientDisconnect()
+    {
+        base.OnClientDisconnect();
+        print("client Disconnect! ");
+    }
 
 }
 
