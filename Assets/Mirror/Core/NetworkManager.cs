@@ -817,6 +817,7 @@ namespace Mirror
         // We need to check this in OnClientSceneChanged called from FinishLoadSceneClientOnly
         // to prevent AddPlayer message after loading/unloading additive scenes
         SceneOperation clientSceneOperation = SceneOperation.Normal;
+        public readonly bool isHost;
 
         internal void ClientChangeScene(string newSceneName, SceneOperation sceneOperation = SceneOperation.Normal, bool customHandling = false)
         {

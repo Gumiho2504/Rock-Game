@@ -25,33 +25,23 @@ public class RockNetworkManager : NetworkManager
       
         public override void OnServerDisconnect(NetworkConnectionToClient conn)
         {
-        // destroy ball
-        /* if (playerChoice != null)
-             NetworkServer.Destroy(playerChoice);*/
-
-        // call base functionality (actually destroys the player)
+            //NetworkServer.DestroyPlayerForConnection(conn);
         
-            base.OnServerDisconnect(conn);
+      
+        base.OnServerDisconnect(conn);
+           
         }
-
-        public override void OnStartServer()
+        public override void OnClientDisconnect()
         {
-            base.OnStartServer();
-            print("server start");
+            OnStopClient();
+            base.OnClientDisconnect();
+           
         }
 
-        public override void OnStartClient()
-        {
-            base.OnStartClient();
-            print("Client Joining Server");
-        }
 
-    public override void OnClientDisconnect()
-    {
-        base.OnClientDisconnect();
-        print("client Disconnect! ");
-    }
 
-}
+
+
+}// end of class
 
 

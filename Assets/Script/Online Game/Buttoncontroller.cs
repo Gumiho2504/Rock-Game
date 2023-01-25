@@ -33,11 +33,11 @@ public class Buttoncontroller : MonoBehaviour
         sBtn.SetActive(false);
     }
 
-    [ServerCallback]
+    NetworkConnectionToClient conn;
     public void HomeBtn()
     {
        
-        rockNetworkManager.StopClient();
+       
         print("btn click");
         
     }

@@ -1,13 +1,9 @@
-using Microsoft.Unity.VisualStudio.Editor;
+
 using Mirror;
-using PlayFab.AuthenticationModels;
-using PlayFab.MultiplayerModels;
-using System;
+
+
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Dependencies.Sqlite;
-using UnityEditor.PackageManager;
+using Telepathy;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -15,6 +11,7 @@ using Image = UnityEngine.UI.Image;
 
 public class Player : NetworkBehaviour
 {
+    RockNetworkManager networkManager;
     [Header("Main")]
     [SyncVar]
     GameChoices selectedChoice;
@@ -25,33 +22,130 @@ public class Player : NetworkBehaviour
     [SerializeField] Sprite paper;
     [SerializeField] Sprite scissor;
     [SerializeField]
-    private GameObject winLoseInfo;
+    private GameObject winLoseInfo, winLoseScreen;
     public Text winLoseText;
     private string winLoseString;
     private bool clientSelected = false , serverselected = false;
-    bool state = false;
+    bool serverClientUnselected = true;
     [SerializeField]
-    private Text player1_ScoreText, player2_scoreText;
+    private Text player1_ScoreText, player2_scoreText, winLose_text, player1_WinScoreText, player2_WinScoreText;
     private int player1_Score = 0, player2_Score = 0;
+    private float timeStart = 10;
+    public Text timeText, timeheader;
+    private bool timeActive = true, autoSelect1 = true, autoSelect2 = true ;
     [ClientCallback]
-    private void Awake()
+    private void Start()
     {
-       
+        //timeText.text = timeStart.ToString();
+        
+
     }
+
+    [ClientCallback]
     private void Update()
     {
+        if (timeActive)
+        {
+            timeStart -= Time.deltaTime;
+            timeText.text = Mathf.Round(timeStart).ToString();
+        }
+
      
-        if(serverselected && clientSelected)
+        // /client Server made choice
+        if (serverselected && clientSelected)
         {
             PlayerMadeChoice();
             DetermineWhowin();
             clientSelected = false;
             serverselected = false;
         }
+
+        // Client and Server Auto Choice
+       
     }
+
+
+
+    [ClientCallback]
+    private void FixedUpdate()
+    {
+
+        if (timeStart <= 0 && serverClientUnselected)
+        {
+            serverClientUnselected = false;
+            timeActive = false;
+            int k = Random.Range(0, 3);
+            switch (k)
+            {
+                case 0:
+                    serveChoice = clientChoice = GameChoices.ROCK;
+                    break;
+                case 1:
+                    serveChoice = clientChoice = GameChoices.PAPER;
+                    break;
+                case 2:
+                    serveChoice = clientChoice = GameChoices.SCISSORS;
+                    break;
+            }
+            ServerChoiceImageOption();
+            ClientChoiceImageOption();
+            PlayerMadeChoice();
+            DetermineWhowin();
+
+
+        }
+        
+
+        if (timeStart <= 0 && !serverselected && clientSelected)
+        {
+            timeActive = false;
+            if(clientChoice == GameChoices.PAPER)
+            {
+                serveChoice = GameChoices.ROCK;
+            }else if(clientChoice == GameChoices.SCISSORS)
+            {
+                serveChoice = GameChoices.PAPER;
+            }else if(clientChoice == GameChoices.ROCK)
+            {
+                serveChoice = GameChoices.SCISSORS;
+                
+            }
+            ServerChoiceImageOption();
+            PlayerMadeChoice();
+            DetermineWhowin();
+            clientSelected = false;
+
+        }
+
+
+        if (timeStart <= 0 && !clientSelected && serverselected)
+        {
+            timeActive = false;
+            if (serveChoice == GameChoices.PAPER)
+            {
+                clientChoice = GameChoices.ROCK;
+            }
+            else if (serveChoice == GameChoices.SCISSORS)
+            {
+                clientChoice = GameChoices.PAPER;
+            }
+            else if (serveChoice == GameChoices.ROCK)
+            {
+                clientChoice = GameChoices.SCISSORS;
+            }
+            ClientChoiceImageOption();
+            PlayerMadeChoice();
+            DetermineWhowin();
+            serverselected = false;
+        }
+       
+    }
+
+
+    // server and client choice
     public void Choice()
     {
-       state = true;    
+       //state = true;    
         string choiceName = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name;
 
 
@@ -100,6 +194,7 @@ public class Player : NetworkBehaviour
         print("Cmd choice" + Sync);
         Client(Sync);
         clientSelected = true;
+        autoSelect2 = false;
       
     }
 
@@ -111,6 +206,7 @@ public class Player : NetworkBehaviour
         ClientChoiceImageOption();
         print("client TargetRpc");
         clientSelected = true;
+        autoSelect2 = false;
     }
 
 
@@ -122,6 +218,7 @@ public class Player : NetworkBehaviour
         ServerChoiceImageOption();
         print("rpc choice" + Sync);
         serverselected = true;
+        autoSelect1 = false;
     }
 
 
@@ -220,6 +317,8 @@ public class Player : NetworkBehaviour
         playerchoiceAnimation.Play("ShowChoice");
     }
 
+
+    // Caculate and then restart choice 
     IEnumerator DisplayWinnerAndRestart()
     {
         yield return new WaitForSeconds(0.5f);
@@ -227,25 +326,92 @@ public class Player : NetworkBehaviour
         //selected2.SetActive(false);
 
         yield return new WaitForSeconds(0.5f);
-        //info_txt.gameObject.SetActive(true);
         winLoseInfo.SetActive(true);
 
         yield return new WaitForSeconds(1f);
-        //info_txt.gameObject.SetActive(false);
         winLoseInfo.SetActive(false);
         ResetAnimation();
+        timeStart = 10;
       
+        timeActive = true;
+        serverClientUnselected = true;
+
     }
 
+     // Game Score
     private void Player1Score()
     {
         player1_Score++;
         player1_ScoreText.text = player1_Score.ToString();
+        player1_WinScoreText.text = player1_Score.ToString();
+        Invoke("PlayerWinOrLose", 2.0f);
+        print("score 1 : " + player1_Score);
     }
     private void Player2Score()
     {
         player2_Score++;
-        player2_scoreText.text = player2_Score.ToString(); 
+        player2_scoreText.text = player2_Score.ToString();
+        player2_WinScoreText.text = player2_Score.ToString();
+        Invoke("PlayerWinOrLose", 2.0f);
+        print("score 1 : " + player1_Score);
+    }
+    private void PlayerWinOrLose()
+    {
+        if (player1_Score == 2)
+        {
+            Time.timeScale = 0;
+            winLose_text.text = "PLAYER IS WINNER";
+
+            winLoseScreen.gameObject.SetActive(true);
+            NetworkManager.singleton.StopHost();
+            NetworkManager.singleton.StopClient();
+            NetworkManager.singleton.StopServer();
+        }
+        if (player2_Score == 2)
+        {
+            Time.timeScale = 0;
+            winLose_text.text = "PLAYER2 IS WINNER";
+            winLoseScreen.gameObject.SetActive(true);
+            NetworkManager.singleton.StopHost();
+            NetworkManager.singleton.StopClient();
+            NetworkManager.singleton.StopServer();
+        }
+    }
+   
+    public override void OnStopLocalPlayer()
+    {
+        base.OnStopLocalPlayer();
+    }
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+    }
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+    }
+
+    
+
+   
+    public void HomeBtn()
+    {
+        if (isServer)
+        {
+            NetworkManager.singleton.StopHost();
+            
+        }
+        else
+        {
+            NetworkManager.singleton.StopClient();
+           
+        }
+
+        NetworkManager.singleton.ServerChangeScene("SampleScene");
+
+
+
+
     }
 
 

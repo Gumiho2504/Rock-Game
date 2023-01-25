@@ -37,6 +37,7 @@ public class InputController1 : MonoBehaviour
     }
     private void Start()
     {
+        
         timeText.text = timeStart.ToString();
         timeText.color = Color.green;
         timeheader.color = Color.green;
@@ -44,8 +45,7 @@ public class InputController1 : MonoBehaviour
         l.color = Color.green;
         t.color = Color.green;
         b.color = Color.green;
-        player1AutoSelect();
-        player2AutoSelect();
+      
 
     }
 
@@ -84,45 +84,16 @@ public class InputController1 : MonoBehaviour
             t.color = Color.red;
             b.color = Color.red;
         }
-       /* if (timeStart == 0)
-        {
-            timeActive = false;
-            
-            
-        }*/  
-     
+        player2AutoSelect();
+        player1AutoSelect();
+
+
     }
     private void FixedUpdate()
     {
 
-        player2AutoSelect();
-        player1AutoSelect();
-        
-        /* if (timeStart < 27 && autoSelect2)
-         {
-             timeActive = false;
-             int random = Random.Range(0, 3);
-
-             switch (random)
-             {
-                 case 0:
-                     selectedChoice_player2 = GameChoices.ROCK;
-                     autoSelect2 = false;
-                     break;
-                 case 1:
-                     selectedChoice_player2 = GameChoices.PAPER;
-                     autoSelect2 = false;
-                     break;
-                 case 2:
-                     selectedChoice_player2 = GameChoices.SCISSORS;
-                     autoSelect2 = false;
-                     break;
-             }
-             print("Player 2 selected : " + random);
-             gameplayController1.SetChoices_Player2(selectedChoice_player2);
-             animationController1.PlayerMadeChoice();
-             DetermineWinner();
-         }*/
+       
+   
     }
     public void player2AutoSelect()
     {
